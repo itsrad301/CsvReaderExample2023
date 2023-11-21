@@ -10,7 +10,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Week4.Console
+namespace DataModel
 {
     public class SchoolContext : DbContext
     {
@@ -21,7 +21,6 @@ namespace Week4.Console
         }
         public SchoolContext(DbContextOptions<SchoolContext> options) : base(options)
         {
-            //Database.EnsureDeleted();
             Database.EnsureCreated();
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -34,10 +33,10 @@ namespace Week4.Console
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Student>().HasData(Get<Student>("CsvReaderExample2023.StudentList1.csv").ToArray());
+            modelBuilder.Entity<Student>().HasData(Get<StudentMap,Student>("CsvReaderExample2023.StudentList1.csv").ToArray());
         }
 
-        public static List<T> Get<T>(string resourceName)
+        public static List<T> Get<U,T>(string resourceName) where U : ClassMap where T : class
         {
             // Get the current assembly
             Assembly assembly = Assembly.GetExecutingAssembly();
@@ -46,12 +45,28 @@ namespace Week4.Console
                 using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
                 {
                     CsvConfiguration configuration = new CsvConfiguration(CultureInfo.InvariantCulture)
-                    { HasHeaderRecord = false };
+                    { HasHeaderRecord = true, HeaderValidated=null, MissingFieldFound=null };
                     // create a csv reader dor the stream
                     CsvReader csvReader = new CsvReader(reader, configuration);
+                    csvReader.Context.RegisterClassMap<U>();
                     return csvReader.GetRecords<T>().ToList();
                 }
             }
         }
+
+
+        //public static List<T> Get<U, T>(string resourceName) where U : ClassMap where T : class
+        //{
+        //    {
+        //        using (StreamReader reader = new StreamReader(resourceName, Encoding.UTF8))
+        //        {
+        //            CsvConfiguration configuration = new CsvConfiguration(CultureInfo.InvariantCulture)
+        //            { HasHeaderRecord = true };
+        //            CsvReader csvReader = new CsvReader(reader, CultureInfo.InvariantCulture);
+        //            csvReader.Context.RegisterClassMap<U>();
+        //            return csvReader.GetRecords<T>().ToList();
+        //        }
+        //    }
+        //}
     }
 }
