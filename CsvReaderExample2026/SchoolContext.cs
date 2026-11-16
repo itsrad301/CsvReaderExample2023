@@ -26,14 +26,14 @@ namespace DataModel
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
 
-            var myconnectionstring = "Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = ppowellSchoolDb";
+            var myconnectionstring = "Data Source = (localdb)\\MSSQLLocalDB; Initial Catalog = ppowellSchoolDb-2026";
             optionsBuilder.UseSqlServer(myconnectionstring);
 
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Student>().HasData(Get<StudentMap,Student>("CsvReaderExample2023.StudentList1.csv").ToArray());
+            modelBuilder.Entity<Student>().HasData(Get<StudentMap,Student>("CsvReaderExample2026.StudentList1.csv").ToArray());
         }
 
         public static List<T> Get<U,T>(string resourceName) where U : ClassMap where T : class
